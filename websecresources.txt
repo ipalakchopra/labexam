@@ -1,3 +1,5 @@
+^(http|ws)://websec-bodhi.duckdns.org:3000.*
+
 https://docs.google.com/document/d/1weHw4zHzpQf-F3opMPlodW5PWfYIGnNr9rhRt3t2oI0/edit?tab=t.0
 error inducing payloads
 

